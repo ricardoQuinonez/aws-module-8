@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
-import { AwsModule8Stack } from '../lib/aws_module8-stack';
+import { CartStack } from '../lib/cart-stack';
 
 const app = new cdk.App();
-new AwsModule8Stack(app, 'AwsModule8Stack', {
+new CartStack(app, 'CartStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */

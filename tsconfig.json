@@ -6,6 +6,7 @@
     "lib": [
       "es2022"
     ],
+    "esModuleInterop" : true,
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
@@ -21,12 +22,19 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "src/*": [
+        "../nodejs-aws-cart-api/src/*"
+      ]
+    },
     "typeRoots": [
       "./node_modules/@types"
     ]
   },
   "exclude": [
     "node_modules",
-    "cdk.out"
+    "cdk.out",
+    "lib/bootstrap-nest/**/*"
   ]
 }
