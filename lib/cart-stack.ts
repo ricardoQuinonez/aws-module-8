@@ -104,6 +104,13 @@ export class CartStack extends cdk.Stack {
       deletionProtection: false
     });
 
+    const dbSecret = dbInstance.secret ?? dbCredentialsSecret;
+    if (!dbSecret) {
+      throw new Error('Unable to resolve database secret');
+    }
+    const dbUsernameFromSecret = dbSecret.secretValueFromJson('username').unsafeUnwrap();
+    const dbPasswordFromSecret = dbSecret.secretValueFromJson('password').unsafeUnwrap();
+
     const nestProjectDir = path.join(__dirname, '..', '..', 'nodejs-aws-cart-api');
     const lambdaFunction = new lambdaNodejs.NodejsFunction(this, 'LambdaFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
@@ -121,8 +128,11 @@ export class CartStack extends cdk.Stack {
       environment: {
         DB_HOST: dbInstance.dbInstanceEndpointAddress,
         DB_PORT: dbInstance.dbInstanceEndpointPort,
-        DB_SECRET_ARN: dbCredentialsSecret.secretArn,
+        DB_SECRET_ARN: dbSecret.secretArn,
         DB_NAME: dbName,
+        DB_USERNAME: dbUsernameFromSecret,
+        DB_PASSWORD: dbPasswordFromSecret,
+        DB_SSL: 'true',
       },
       bundling: {
         sourceMap: true,
@@ -148,6 +158,11 @@ export class CartStack extends cdk.Stack {
     const api = new apigateway.RestApi(this, 'NestApi', {
       restApiName: 'Nest Service',
       description: 'This service serves a Nest.js application.',
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
+      },
     });
 
     const getLambdaIntegration = new apigateway.LambdaIntegration(lambdaFunction);
